@@ -1,18 +1,22 @@
 module Ingredients
-( Grams
-, Milliliters
-, Fermentable
-, Mash
+( Weight
+, Volume
+, Fermentable(..)
+, Mash(..)
 ) where
 
-type Grams = Integer
-type Milliliters = Integer
+newtype Weight = Grams Integer
+newtype Volume = Milliliters Integer
+type Percentage = Integer
+type Efficiency = Percentage
 
 data Fermentable = Fermentable	{  name :: String,
-								   fermentableContent :: Integer
+								   fermentableContent :: Percentage
 								}
 
 
-data Mash = Mash { 	fermentables :: [Fermentable -> Grams],
-					water :: Milliliters
+data Mash = Mash { 	fermentables :: [Fermentable -> Weight],
+					water :: Volume
 				 }
+
+data Wort = Wort Mash Volume Efficiency
