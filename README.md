@@ -1,0 +1,4 @@
+brewcalc
+========
+
+Homebrew recipe tool
