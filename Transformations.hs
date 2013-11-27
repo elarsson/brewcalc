@@ -18,7 +18,7 @@ sparge mash vol density = Wort mash vol density
 
 boil :: HoppedWort -> Duration -> HoppedWort
 boil hoppedwort (Minutes mins) = 
-	hoppedwort { hops = map (\(n, Minutes oldmins) -> (n, Minutes $ oldmins + mins)) $ hops hoppedwort} -- TODO, calculate boiloff and new density
+    hoppedwort { hops = map (\(n, Minutes oldmins) -> (n, Minutes $ oldmins + mins)) $ hops hoppedwort} -- TODO, calculate boiloff and new density
 
 ferment :: HoppedWort -> Density -> Beer
 ferment hoppedwort finalgravity = Beer hoppedwort (IBU 0) 5 -- TODO: calculate IBU from (hops,dur) and ABV from gravity

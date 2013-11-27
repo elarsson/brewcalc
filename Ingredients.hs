@@ -5,6 +5,10 @@ module Ingredients
 , Mash(..)
 , Wort(..)
 , Beer(..)
+, HoppedWort(..)
+, Density
+, Duration(..)
+, Bitterness(..)
 ) where
 
 newtype Weight = Grams Integer
@@ -16,23 +20,23 @@ newtype Duration = Minutes Integer
 newtype Bitterness = IBU Integer
 type ABV = Percentage
 
-data Fermentable = Fermentable	{  name :: String,
-								   fermentableContent :: Percentage -- TODO: use to calculate efficiency
-								}
+data Fermentable = Fermentable  { name :: String,
+                                 fermentableContent :: Percentage -- TODO: use to calculate efficiency
+                                }
 
-data Hops = Hops { 	hopname :: String,
-					alphacontent :: Percentage
-				 }
+data Hops = Hops {  hopname :: String,
+                    alphacontent :: Percentage
+                 }
 
-data Mash = Mash { 	fermentables :: [(Fermentable, Weight)],
-					water :: Volume
-				 }
+data Mash = Mash {  fermentables :: [(Fermentable, Weight)],
+                    water :: Volume
+                 }
 
 data Wort = Wort Mash Volume Density
 
-data HoppedWort = HoppedWort { 	wort :: Wort,
-								hops :: [(Hops, Duration)]
-							 }
+data HoppedWort = HoppedWort {  wort :: Wort,
+                                hops :: [(Hops, Duration)]
+                             }
 
 data Beer = Beer HoppedWort Bitterness ABV
 
