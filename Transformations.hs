@@ -1,5 +1,5 @@
 module Transformations
-( initiateMash
+( mkMash
 , addFermentable
 , sparge
 , boil
@@ -7,8 +7,8 @@ module Transformations
 ) where
 import Ingredients
 
-initiateMash :: Volume -> Mash
-initiateMash vol = Mash { fermentables = [], water = vol }
+mkMash :: Volume -> Mash
+mkMash vol = Mash { fermentables = [], water = vol }
 
 addFermentable :: Fermentable -> Weight -> Mash -> Mash
 addFermentable ferm wt mash =

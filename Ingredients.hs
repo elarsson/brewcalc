@@ -18,6 +18,7 @@ newtype Volume = Milliliters Integer
 newtype Bitterness = IBU Integer
 newtype Duration = Minutes Integer
 
+
 type Percentage = Integer
 type Efficiency = Percentage
 
@@ -27,7 +28,7 @@ type ABV = Percentage
 
 -- Components
 data Fermentable =
-     Fermentable { name :: String, fermentableContent :: Percentage } -- TODO: use content to calculate efficiency
+     Grain { name :: String, fermentableContent :: Percentage } -- TODO: use content to calculate efficiency
 
 data Hops = Hops { hopname :: String, alphacontent :: Percentage }
 
@@ -38,4 +39,3 @@ data Wort = Wort Mash Volume Density
 data HoppedWort = HoppedWort {  wort :: Wort, hops :: [(Hops, Duration)] }
 
 data Beer = Beer HoppedWort Bitterness ABV
-
