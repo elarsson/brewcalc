@@ -1,41 +1,36 @@
 module Ingredients
-( Weight
-, Volume
+( Weight(..)
+, Density(..)
+, Volume(..)
 , Fermentable(..)
 , Mash(..)
 , Wort(..)
 , Beer(..)
-, HoppedWort(..)
-, Density
 , Duration(..)
 , Bitterness(..)
 , Hops(..)
+, Percentage(..)
+, ABV(..)
 ) where
 
 -- Units
-newtype Weight = Grams Integer
-newtype Volume = Milliliters Integer
-newtype Bitterness = IBU Integer
-newtype Duration = Minutes Integer
-
-
-type Percentage = Integer
-type Efficiency = Percentage
-
-type Density = Float
-
-type ABV = Percentage
+newtype Weight = Grams Float
+newtype Volume = Milliliters Float
+newtype Bitterness = IBU Float
+newtype Duration = Minutes Float
+newtype Density = Density Float
+newtype Percentage = Percentage Float
+newtype Efficiency = Efficiency Percentage
+newtype ABV = ABV Percentage
 
 -- Components
 data Fermentable =
-     Grain { name :: String, fermentableContent :: Percentage } -- TODO: use content to calculate efficiency
+     Grain { grainName :: String, fermentableContent :: Percentage } -- TODO: use content to calculate efficiency
 
-data Hops = Hops { hopname :: String, alphacontent :: Percentage }
+data Hops = Hops { hopName :: String, alphaContent :: Percentage }
 
-data Mash = Mash {  fermentables :: [(Fermentable, Weight)], water :: Volume }
+data Mash = Mash { fermentables :: [(Fermentable, Weight)], water :: Volume }
 
-data Wort = Wort Mash Volume Density
+data Wort = Wort { mash :: Mash, volume :: Volume, gravity :: Density, hopsContent :: [(Hops, Duration)] } -- TODO: need amount of hops
 
-data HoppedWort = HoppedWort {  wort :: Wort, hops :: [(Hops, Duration)] }
-
-data Beer = Beer HoppedWort Bitterness ABV
+data Beer = Beer Wort ABV

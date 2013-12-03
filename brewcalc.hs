@@ -1,8 +1,8 @@
 import Ingredients
 import Transformations
 
-pilsnerMalt = Grain { name="Pilsner malt", fermentableContent=4 }
-crystalMalt = Grain { name="Crystal malt", fermentableContent=0 }
+pilsnerMalt = Grain { grainName="Pilsner malt", fermentableContent = Percentage 4.0 }
+crystalMalt = Grain { grainName="Crystal malt", fermentableContent = Percentage 5.0 }
 
 main :: IO ()
 main = putStrLn "hello"
