@@ -11,6 +11,7 @@ module Ingredients
 , Hops(..)
 , Percentage(..)
 , ABV(..)
+, HopAmount(..)
 ) where
 
 -- Units
@@ -22,6 +23,7 @@ newtype Density = Density Float
 newtype Percentage = Percentage Float
 newtype Efficiency = Efficiency Percentage
 newtype ABV = ABV Percentage
+data HopAmount = HopAmount Hops Weight
 
 -- Components
 data Fermentable =
@@ -31,6 +33,6 @@ data Hops = Hops { hopName :: String, alphaContent :: Percentage }
 
 data Mash = Mash { fermentables :: [(Fermentable, Weight)], water :: Volume }
 
-data Wort = Wort { mash :: Mash, volume :: Volume, gravity :: Density, hopsContent :: [(Hops, Duration)] } -- TODO: need amount of hops
+data Wort = Wort { mash :: Mash, volume :: Volume, gravity :: Density, hopsContent :: [(HopAmount, Duration)] } -- TODO: need amount of hops
 
 data Beer = Beer Wort ABV

@@ -4,6 +4,7 @@ module Transformations
 , sparge
 , boil
 , ferment
+, utilization
 ) where
 import Ingredients
 
@@ -22,7 +23,7 @@ sparge mash vol density = Wort { mash = mash, volume = vol, gravity = density, h
 
 boil :: Wort -> Duration -> Wort
 boil hoppedWort boilDuration = 
-    let addDuration :: Duration -> (Hops, Duration) -> (Hops, Duration)
+    let addDuration :: Duration -> (HopAmount, Duration) -> (HopAmount, Duration)
         addDuration (Minutes boilTime) (h, Minutes d) = (h, Minutes $ d + boilTime)
 
         newVolume :: Volume
@@ -34,10 +35,25 @@ boil hoppedWort boilDuration =
         hoppedWort { hopsContent = map (addDuration boilDuration) $ hopsContent hoppedWort, volume = newVolume, gravity = newGravity }
 
 boilOff :: Duration -> Volume
-boilOff (Minutes m) = Milliliters $ m * (4000.0 / 60.0) -- TODO: don't hardcode
+boilOff (Minutes m) = Milliliters $ m * (4000.0 / 60.0) -- TODO: 4 liters/hour... don't hardcode
 
 dilute :: Density -> Volume -> Volume -> Density
 dilute (Density oldDensity) (Milliliters oldVolume) (Milliliters newVolume) = Density $ (newVolume / oldVolume) * oldDensity
 
+utilization :: Density -> Duration -> Float
+utilization (Density dens) (Minutes dur) = (1.65 * 0.000125**(dens - 1.0)) * ((1 - exp(-0.04 * dur)) / 4.15)
+
+getBitterness :: Wort -> Bitterness
+getBitterness wort =
+    let
+        partialBitterness :: (HopAmount, Duration) -> Bitterness
+        partialBitterness (HopAmount hops (Grams weight), duration) = case (alphaContent hops, volume wort) of 
+                                                                            (Percentage ac, Milliliters vol) -> IBU (ac * weight * (utilization (gravity wort) duration) / vol)
+    in
+        foldr (\(IBU x) (IBU y) -> IBU (x + y)) (IBU 0) $ map partialBitterness (hopsContent wort)
+
+getABV :: Density -> Density -> ABV
+getABV (Density og) (Density fg) = ABV (Percentage ((76.08 * (og-fg) / (1.775 - og) ) * (fg / 0.794)))
+
 ferment :: Wort -> Density -> Beer
-ferment hoppedwort finalgravity = Beer hoppedwort $ ABV $ Percentage 5.0 -- TODO: calculate IBU from (hops,dur) and ABV from gravity
+ferment hoppedwort finalgravity = Beer hoppedwort $ getABV (gravity hoppedwort) finalgravity -- TODO: calculate IBU from (hops,dur) and ABV from gravity
