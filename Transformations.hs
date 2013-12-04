@@ -24,11 +24,10 @@ sparge mash vol density = Wort { mash = mash, volume = vol, gravity = density, h
 boil :: Wort -> Duration -> Wort
 boil hoppedWort boilDuration = 
     let addDuration :: Duration -> (HopAmount, Duration) -> (HopAmount, Duration)
-        addDuration (Minutes boilTime) (h, Minutes d) = (h, Minutes $ d + boilTime)
+        addDuration boilTime (h, d) = (h, d + boilTime)
 
         newVolume :: Volume
-        newVolume = case (volume hoppedWort, (boilOff boilDuration)) of
-                        ((Milliliters m), Milliliters m2) -> Milliliters $ m - m2
+        newVolume = (volume hoppedWort) - (boilOff boilDuration)
         
         newGravity = dilute (gravity hoppedWort) (volume hoppedWort) newVolume
     in 
@@ -39,6 +38,9 @@ boilOff (Minutes m) = Milliliters $ m * (4000.0 / 60.0) -- TODO: 4 liters/hour..
 
 dilute :: Density -> Volume -> Volume -> Density
 dilute (Density oldDensity) (Milliliters oldVolume) (Milliliters newVolume) = Density $ (newVolume / oldVolume) * oldDensity
+
+diluteWort :: Wort -> Volume -> Wort
+diluteWort wort volume = wort --TODO: fix
 
 utilization :: Density -> Duration -> Float
 utilization (Density dens) (Minutes dur) = (1.65 * 0.000125**(dens - 1.0)) * ((1 - exp(-0.04 * dur)) / 4.15)
