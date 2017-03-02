@@ -1,5 +1,12 @@
 Notes:
 
+Possible to create a typeclass for metric stuff (i.e. milli,kilo,micro etc)?
+Possible to create a duration class that can handle hours, minutes, seconds all in one?
+
+Mash needs to have temperature and duration.
+
+
+
 Some formulas here: http://homebrewmanual.com/home-brewing-calculations/
 
 Book: ​A Handbook of Basic Brewing Calculations​​​, Holle

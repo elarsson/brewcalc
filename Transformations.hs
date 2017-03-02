@@ -19,7 +19,7 @@ addFermentable ferm wt mash =
          }
 
 sparge :: Mash -> Volume -> Density -> Wort
-sparge mash vol density = Wort { mash = mash, volume = vol, gravity = density, hopsContent = [] }
+sparge mash resultingVolume resultingDensity = Wort { mash = mash, volume = resultingVolume, gravity = resultingDensity, hopsContent = [] }
 
 boil :: Wort -> Duration -> Wort
 boil hoppedWort boilDuration = 
@@ -42,7 +42,7 @@ dilute (Density oldDensity) (Milliliters oldVolume) (Milliliters newVolume) = De
 diluteWort :: Wort -> Volume -> Wort
 diluteWort wort volume = wort --TODO: fix
 
-utilization :: Density -> Duration -> Float
+utilization :: Density -> Duration -> Double
 utilization (Density dens) (Minutes dur) = (1.65 * 0.000125**(dens - 1.0)) * ((1 - exp(-0.04 * dur)) / 4.15)
 
 getBitterness :: Wort -> Bitterness
