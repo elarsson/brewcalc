@@ -87,7 +87,9 @@ data Fermentable =
 
 data Hops = Hops { hopName :: String, alphaContent :: Percentage } deriving Show
 
-data Mash = Mash { fermentables :: [(Fermentable, Weight)], water :: Volume } deriving Show
+data MashStep = MashStep { initialTemperature :: Temperature, finalTemperature :: Temperature, duration :: Duration }
+
+data Mash = Mash { fermentables :: [(Fermentable, Weight)], water :: Volume, mashStep :: Maybe MashStep, mash :: Mash } deriving Show
 
 data Wort = Wort { mash :: Mash, volume :: Volume, gravity :: Density, hopsContent :: [(HopAmount, Duration)] } deriving Show -- TODO: need amount of hops
 

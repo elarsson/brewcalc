@@ -18,6 +18,9 @@ addFermentable ferm wt mash =
             water = water mash
          }
 
+mash :: Mash -> Temperature -> Temperature -> Duration
+mash m startTemperature endTemperature duration = m
+
 sparge :: Mash -> Volume -> Density -> Wort
 sparge mash resultingVolume resultingDensity = Wort { mash = mash, volume = resultingVolume, gravity = resultingDensity, hopsContent = [] }
 
