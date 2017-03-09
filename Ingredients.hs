@@ -75,22 +75,28 @@ instance Show Percentage where
     show (Percentage a) = show a ++ "%"
 
 newtype Efficiency = Efficiency Percentage deriving (Show)
-
+newtype Temperature = Celsius Double deriving (Show)
 newtype ABV = ABV Percentage
 
 data HopAmount = HopAmount Hops Weight deriving (Show)
-
+type FinalVolume = Volume
+type InitialTemperature = Temperature
+type FinalTemperature = Temperature
 
 -- Components
 data Fermentable =
-     Grain { grainName :: String, extractPotential :: Efficiency }  deriving Show
+     Grain { grainName :: String, extractPotential :: Efficiency } deriving Show
 
 data Hops = Hops { hopName :: String, alphaContent :: Percentage } deriving Show
 
-data MashStep = MashStep { initialTemperature :: Temperature, finalTemperature :: Temperature, duration :: Duration }
+data Wort = Sparge Mash FinalVolume Density
+    | AddHops Hops Weight Wort
+    | Boil Duration Wort
+    | Chill Duration FinalTemperature Wort
+    | Dilute FinalVolume Wort deriving (Show)
 
-data Mash = Mash { fermentables :: [(Fermentable, Weight)], water :: Volume, mashStep :: Maybe MashStep, mash :: Mash } deriving Show
+data Mash = AddWater Volume
+    | AddGrain Fermentable Weight Mash
+    | DoMash InitialTemperature FinalTemperature Duration Mash deriving (Show)
 
-data Wort = Wort { mash :: Mash, volume :: Volume, gravity :: Density, hopsContent :: [(HopAmount, Duration)] } deriving Show -- TODO: need amount of hops
-
-data Beer = Beer Wort ABV
+data Beer = Ferment Wort Temperature Duration deriving (Show)
