@@ -1,5 +1,6 @@
 import Ingredients
 import Transformations
+import Utilities
 
 pilsnerMalt = Grain { grainName="Pilsner malt", extractPotential = Efficiency (Percentage 80.0) }
 crystalMalt = Grain { grainName="Crystal malt", extractPotential = Efficiency (Percentage 76.0) }

@@ -13,6 +13,10 @@ module Ingredients
 , Efficiency(..)
 , ABV(..)
 , HopAmount(..)
+, ResultingVolume(..)
+, InitialTemperature(..)
+, FinalTemperature(..)
+, Temperature(..)
 ) where
 
 -- Units
@@ -79,7 +83,7 @@ newtype Temperature = Celsius Double deriving (Show)
 newtype ABV = ABV Percentage
 
 data HopAmount = HopAmount Hops Weight deriving (Show)
-type FinalVolume = Volume
+type ResultingVolume = Volume
 type InitialTemperature = Temperature
 type FinalTemperature = Temperature
 
@@ -89,11 +93,12 @@ data Fermentable =
 
 data Hops = Hops { hopName :: String, alphaContent :: Percentage } deriving Show
 
-data Wort = Sparge Mash FinalVolume Density
+data Wort = Sparge Mash ResultingVolume Density
     | AddHops Hops Weight Wort
     | Boil Duration Wort
     | Chill Duration FinalTemperature Wort
-    | Dilute FinalVolume Wort deriving (Show)
+    | Concentrate ResultingVolume Wort
+    | Dilute ResultingVolume Wort deriving (Show)
 
 data Mash = AddWater Volume
     | AddGrain Fermentable Weight Mash
