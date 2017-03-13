@@ -5,6 +5,9 @@ module Transformations
 , boil
 , boilWithEvaporation
 , chill
+, spargeWithEstimate
+, addHops
+, ferment
 --, boil
 --, ferment
 --, utilization
@@ -18,14 +21,17 @@ mkMash vol = AddWater vol
 addFermentable :: Fermentable -> Weight -> Mash -> Mash
 addFermentable ferm wt mash = AddGrain ferm wt mash
 
-doMash :: InitialTemperature -> FinalTemperature -> Duration -> Mash -> Mash
-doMash initialTemperature finalTemperature duration mash = DoMash initialTemperature finalTemperature duration mash
+doMash :: Mash -> InitialTemperature -> FinalTemperature -> Duration -> Mash
+doMash mash initialTemperature finalTemperature duration = DoMash initialTemperature finalTemperature duration mash
 
 sparge :: Mash -> ResultingVolume -> Density -> Wort
 sparge mash resultingVolume finalDensity = Sparge mash resultingVolume finalDensity
 
-spargeWithEstimate Mash -> ResultingVolume -> Wort
-spargeWithEstimate mash vol = sparge mash resultingVolume $ estimateDensityAfterSparge mash
+spargeWithEstimate :: Mash -> ResultingVolume -> Wort
+spargeWithEstimate mash vol = sparge mash vol $ estimateDensityAfterSparge mash
+
+addHops :: Wort -> Hops -> Weight -> Wort
+addHops wort hops weight = AddHops hops weight wort
 
 boil :: Wort -> Duration -> Wort
 boil wort duration = Boil duration wort

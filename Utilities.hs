@@ -21,7 +21,7 @@ getVolume :: Wort -> Volume
 getVolume (Sparge _ vol _) = vol
 getVolume (AddHops _ _ w) = getVolume w
 getVolume (Boil _ w) = getVolume w
-getVolume (Chill _ _ w) = getVolume w
+getVolume (Chill _ w) = getVolume w
 getVolume (Concentrate v _) = v
 getVolume (Dilute v _) = v
 

@@ -96,7 +96,7 @@ data Hops = Hops { hopName :: String, alphaContent :: Percentage } deriving Show
 data Wort = Sparge Mash ResultingVolume Density
     | AddHops Hops Weight Wort
     | Boil Duration Wort
-    | Chill Duration FinalTemperature Wort
+    | Chill FinalTemperature Wort
     | Concentrate ResultingVolume Wort
     | Dilute ResultingVolume Wort deriving (Show)
 
