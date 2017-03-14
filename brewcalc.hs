@@ -13,15 +13,18 @@ mashSteps = [
                 addFermentable crystalMalt (Grams 500)
             ]
 
-mashIt :: Mash -> [Mash -> Mash] -> Mash            
-mashIt m (x:[]) = x m
-mashIt m (x:xs) = mashIt (x m) xs
+m1 = sequence mashSteps (mkMash (Milliliters 12000))
+-- mashIt :: Mash -> [Mash -> Mash] -> Mash            
+-- mashIt m (x:[]) = x m
+-- mashIt m (x:xs) = mashIt (x m) xs
 
-wortIt :: Wort -> [Wort -> Wort] -> Wort
-wortIt w (x:[]) w = x w
-wortIt w (x:xs) w = wortIt (x w) xs
+-- wortIt :: Wort -> [Wort -> Wort] -> Wort
+-- wortIt (x:[]) w = x w
+-- wortIt (x:xs) w = wortIt (x w) xs
 
-m1 = wortIt wortSteps $ mashIt (mkMash (Milliliters 12000)) mashSteps
+-- m1 = wortIt wortSteps $ mashIt (mkMash (Milliliters 12000)) mashSteps
+
+
 -- m2 =  addFermentable pilsnerMalt (Grams 5000) $ mkMash (Milliliters 12000)
 -- m3 = addFermentable crystalMalt (Grams 500) m2
 -- w1 = spargeWithEstimate m3 (Milliliters 20000)
