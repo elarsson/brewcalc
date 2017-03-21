@@ -1,26 +1,35 @@
 module BeerXML(
-getHops
+getHops,
+getFermentables
 ) where 
 
---import Ingredients
+import Ingredients
+import IngredientsHops
+import IngredientsFermentable
 import Text.XML.Light
 import Text.Read
 import Data.Maybe
 import Control.Monad
 
-getHops :: String -> [Hop]
-getHops s = 
-    case (parseXMLDoc s) of
+getIngredient :: String -> String -> (Element -> Maybe a) -> String -> [a]
+getIngredient outerTag innerTag parseFn xml = 
+    case (parseXMLDoc xml) of
         Nothing -> []
         Just e -> 
             let 
-                hopsElements :: [Element]
-                hopsElements = (findElements QName { qName = "HOPS", qURI = Nothing, qPrefix = Nothing } e)
+                elements :: [Element]
+                elements = (findElements QName { qName = outerTag, qURI = Nothing, qPrefix = Nothing } e)
 
-                mgh :: Element -> Maybe [Hop]
-                mgh mm = mapM getHop (findChildren QName { qName = "HOP", qURI = Nothing, qPrefix = Nothing } mm)
+                mgh mm = mapM parseFn (findChildren QName { qName = innerTag, qURI = Nothing, qPrefix = Nothing } mm)
             in
-            concat $ concat $ sequence $ map mgh hopsElements
+            concat $ concat $ sequence $ map mgh elements
+
+getHops :: String -> [Hop]
+getHops = getIngredient "HOPS" "HOP" getHop
+
+getFermentables :: String -> [Fermentable]
+getFermentables = getIngredient "FERMENTABLES" "FERMENTABLE" getFermentable
+
 
 getString :: Maybe Element -> Maybe String
 getString = liftM strContent
@@ -53,84 +62,67 @@ getHop e =
             amount <- getValue $ findElement QName { qName = "AMOUNT", qURI = Nothing, qPrefix = Nothing } e
             use <- getValue $ findElement QName { qName = "USE", qURI = Nothing, qPrefix = Nothing } e
             time <- getValue $ findElement QName { qName = "TIME", qURI = Nothing, qPrefix = Nothing } e
-            return Hop { name = name, alpha = alpha, version = version, amount = amount, use = use, time = time, notes = notes, usedAsType = usedAsType, form = form, beta = beta, hSI = hSI, origin = origin, substitutes = substitutes, humulene = humulene, caryophyllene = caryophyllene, cohumulone = cohumulone, myrcene = myrcene}
+            return Hop 
+                {
+                    IngredientsHops.name = name,
+                    alpha = alpha,
+                    IngredientsHops.version = version,
+                    IngredientsHops.amount = amount,
+                    use = use,
+                    time = time,
+                    IngredientsHops.notes = notes,
+                    usedAsType = usedAsType,
+                    form = form,
+                    beta = beta,
+                    hSI = hSI,
+                    IngredientsHops.origin = origin,
+                    substitutes = substitutes,
+                    humulene = humulene,
+                    caryophyllene = caryophyllene,
+                    cohumulone = cohumulone,
+                    myrcene = myrcene
+                }
 
-newtype Weight = Kilograms Double deriving (Eq)
-instance Show Weight where
-    show (Kilograms a) = show a ++ "kg"
-instance Read Weight where
-    readsPrec _ xs = let 
-                        a :: Double
-                        a = read xs
-                    in
-                        return (Kilograms a, "")
 
-data Use = Boil | DryHop | Mash | FirstWort | Aroma deriving (Show, Eq)
-instance Read Use where
-    readsPrec _ "Boil" = return (Boil, "")
-    readsPrec _ "DryHop" = return (DryHop, "")
-    readsPrec _ "Mash" = return (Mash, "")
-    readsPrec _ "FirstWort" = return (FirstWort, "")
-    readsPrec _ "Aroma" = return (Aroma, "")
-    readsPrec _ _ = []
-
-data UsedAs = UsedAsBittering | UsedAsAroma | UsedAsBoth deriving (Show, Eq)
-instance Read UsedAs where
-    readsPrec _ "Bittering" = return (UsedAsBittering, "")
-    readsPrec _ "Aroma" = return (UsedAsAroma, "")
-    readsPrec _ "Both" = return (UsedAsBoth, "")
-    readsPrec _ _ = []
-
-data Form = Pellet | Plug | Leaf deriving (Show, Eq)
-instance Read Form where
-    readsPrec _ "Pellet" = return (Pellet, "")
-    readsPrec _ "Plug" = return (Plug, "")
-    readsPrec _ "Leaf" = return (Leaf, "")
-    readsPrec _ _ = []
-
-type Percentage = Double
-
-data Hop = Hop { name :: String,
-                 version :: Int,
-                 alpha :: Percentage,
-                 amount :: Weight,
-                 use :: Use,
-                 time :: Double,
-                 notes :: Maybe String,
-                 usedAsType :: Maybe UsedAs,
-                 form :: Maybe Form,
-                 beta :: Maybe Percentage,
-                 hSI :: Maybe Percentage,
-                 origin :: Maybe String,
-                 substitutes :: Maybe String,
-                 humulene :: Maybe Percentage,
-                 caryophyllene :: Maybe Percentage,
-                 cohumulone :: Maybe Percentage,
-                 myrcene :: Maybe Percentage
-
-                 -- displayAmount :: Maybe String,
-                 -- displayTime :: String
-                 -- inventory :: String,
-                 }
-  deriving (Show, Eq)
-  
-  
-   -- <NAME>Cascade</NAME>
- -- <VERSION>1</VERSION>
- -- <ORIGIN>US</ORIGIN>
- -- <ALPHA>5.50</ALPHA>
- -- <AMOUNT>0.0000000</AMOUNT>
- -- <USE>Boil</USE>
- -- <TIME>0.000</TIME>
- -- <NOTES>Use For: American ales and lagers
--- Aroma: Strong spicy, floral, grapefriut character
--- Substitutes: Centennial
--- Examples: Sierra Nevade Pale Ale, Anchor Liberty Ale
--- A hops with Northern Brewers Heritage</NOTES>
- -- <TYPE>Both</TYPE>
- -- <FORM>Pellet</FORM>
- -- <BETA>6.00</BETA>
- -- <HSI>50.0</HSI>
- -- <DISPLAY_AMOUNT>0.00 oz</DISPLAY_AMOUNT>
- -- <INVENTORY>0.00 oz</INVENTORY>
- -- <DISPLAY_TIME>-</DISPLAY_TIME>
+getFermentable :: Element -> Maybe Fermentable
+getFermentable e = 
+        let
+            addAfterBoil = getValue $ findElement QName { qName = "ADD_AFTER_BOIL", qURI = Nothing, qPrefix = Nothing } e
+            origin = getString $ findElement QName { qName = "ORIGIN", qURI = Nothing, qPrefix = Nothing } e
+            supplier = getString $ findElement QName { qName = "SUPPLIER", qURI = Nothing, qPrefix = Nothing } e
+            notes = getString $ findElement QName { qName = "NOTES", qURI = Nothing, qPrefix = Nothing } e
+            coarseFineDiff = getValue $ findElement QName { qName = "COARSE_FINE_DIFF", qURI = Nothing, qPrefix = Nothing } e
+            moisture = getValue $ findElement QName { qName = "MOISTURE", qURI = Nothing, qPrefix = Nothing } e
+            diastaticPower = getValue $ findElement QName { qName = "DIASTATIC_POWER", qURI = Nothing, qPrefix = Nothing } e
+            protein = getValue $ findElement QName { qName = "PROTEIN", qURI = Nothing, qPrefix = Nothing } e
+            maxInBatch = getValue $ findElement QName { qName = "MAX_IN_BATCH", qURI = Nothing, qPrefix = Nothing } e
+            recommendMash = getValue $ findElement QName { qName = "RECOMMEND_MASH", qURI = Nothing, qPrefix = Nothing } e
+            ibuGalPerLb = getValue $ findElement QName { qName = "IBU_GAL_PER_LB", qURI = Nothing, qPrefix = Nothing } e
+        in
+        do 
+            name <- getString $ findElement QName { qName = "NAME", qURI = Nothing, qPrefix = Nothing } e
+            version <- getValue $ findElement QName { qName = "VERSION", qURI = Nothing, qPrefix = Nothing } e
+            fermentableType <- getValue $ findElement QName { qName = "TYPE", qURI = Nothing, qPrefix = Nothing } e
+            amount <- getValue $ findElement QName { qName = "AMOUNT", qURI = Nothing, qPrefix = Nothing } e
+            yield <- getValue $ findElement QName { qName = "YIELD", qURI = Nothing, qPrefix = Nothing } e
+            color <- getValue $ findElement QName { qName = "COLOR", qURI = Nothing, qPrefix = Nothing } e
+            return Fermentable
+                {
+                    IngredientsFermentable.name = name,
+                    IngredientsFermentable.version = version,
+                    IngredientsFermentable.fermentableType = fermentableType,
+                    IngredientsFermentable.amount = amount,
+                    IngredientsFermentable.yield = yield,
+                    IngredientsFermentable.color = color,
+                    IngredientsFermentable.addAfterBoil = addAfterBoil,
+                    IngredientsFermentable.origin = origin,
+                    IngredientsFermentable.supplier = supplier,
+                    IngredientsFermentable.notes = notes,
+                    IngredientsFermentable.coarseFineDiff = coarseFineDiff,
+                    IngredientsFermentable.moisture = moisture,
+                    IngredientsFermentable.diastaticPower = diastaticPower,
+                    IngredientsFermentable.protein = protein,
+                    IngredientsFermentable.maxInBatch = maxInBatch,
+                    IngredientsFermentable.recommendMash = recommendMash,
+                    IngredientsFermentable.ibuGalPerLb = ibuGalPerLb
+                }

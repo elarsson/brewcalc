@@ -2,22 +2,23 @@ module Ingredients
 ( Weight(..)
 , Density(..)
 , Volume(..)
-, Fermentable(..)
-, Mash(..)
-, Wort(..)
-, Beer(..)
+--, Fermentable(..)
+--, Mash(..)
+--, Wort(..)
+--, Beer(..)
 , Duration(..)
 , Bitterness(..)
-, Hops(..)
+--, Hops(..)
 , Percentage(..)
 , Efficiency(..)
 , ABV(..)
-, HopAmount(..)
+--, HopAmount(..)
 , ResultingVolume(..)
 , InitialTemperature(..)
 , FinalTemperature(..)
 , Temperature(..)
 ) where
+import Text.Read
 
 -- Units
 newtype Volume = Milliliters Double
@@ -42,7 +43,7 @@ instance Num Bitterness where
     signum (IBU w) = IBU (signum w)
     fromInteger i = IBU (fromInteger i)
 
-newtype Duration = Minutes Double deriving (Show)
+newtype Duration = Minutes Double deriving (Eq, Show)
 instance Num Duration where
     (+) (Minutes w1) (Minutes w2) = Minutes (w1 + w2)
     (*) (Minutes w1) (Minutes w2) = Minutes (w1 * w2)
@@ -51,6 +52,10 @@ instance Num Duration where
     abs (Minutes w) = Minutes (abs w)
     signum (Minutes w) = Minutes (signum w)
     fromInteger i = Minutes (fromInteger i)
+instance Read Duration where
+    readsPrec _ xs = case readMaybe xs of
+                            Nothing -> []
+                            Just d -> return (Minutes d, "")
 
 newtype Density = Density Double deriving (Show)
 instance Num Density where
@@ -62,46 +67,43 @@ instance Num Density where
     signum (Density w) = Density (signum w)
     fromInteger i = Density (fromInteger i)
 
-newtype Weight = Grams Double
+newtype Weight = Kilograms Double deriving (Eq)
 instance Show Weight where
-    show (Grams a) = show a ++ "g"
-instance Num Weight where
-    (+) (Grams w1) (Grams w2) = Grams (w1 + w2)
-    (*) (Grams w1) (Grams w2) = Grams (w1 * w2)
-    (-) w1 w2 = w1 + negate w2
-    negate (Grams w) = Grams (0 - w)
-    abs (Grams w) = Grams (abs w)
-    signum (Grams w) = Grams (signum w)
-    fromInteger i = Grams (fromInteger i)
+    show (Kilograms a) = show a ++ "kg"
+instance Read Weight where
+    readsPrec _ xs = case readMaybe xs of
+                            Nothing -> []
+                            Just d -> return (Kilograms d, "")
 
-newtype Percentage = Percentage Double
+newtype Percentage = Percentage Double deriving (Eq)
 instance Show Percentage where
     show (Percentage a) = show a ++ "%"
+instance Read Percentage where
+    readsPrec _ xs = case readMaybe xs of
+                            Nothing -> []
+                            Just d -> return (Percentage d, "")
 
 newtype Efficiency = Efficiency Percentage deriving (Show)
 newtype Temperature = Celsius Double deriving (Show)
 newtype ABV = ABV Percentage
 
-data HopAmount = HopAmount Hops Weight deriving (Show)
+--data HopAmount = HopAmount Hops Weight deriving (Show)
 type ResultingVolume = Volume
 type InitialTemperature = Temperature
 type FinalTemperature = Temperature
 
--- Components
-data Fermentable =
-     Grain { grainName :: String, extractPotential :: Efficiency } deriving Show
 
-data Hops = Hops { hopName :: String, alphaContent :: Percentage } deriving Show
+--data Hops = Hops { hopName :: String, alphaContent :: Percentage } deriving Show
 
-data Wort = Sparge Mash ResultingVolume Density
-    | AddHops Hops Weight Wort
-    | Boil Duration Wort
-    | Chill FinalTemperature Wort
-    | Concentrate ResultingVolume Wort
-    | Dilute ResultingVolume Wort deriving (Show)
+-- data Wort = Sparge Mash ResultingVolume Density
+    -- | AddHops Hop Weight Wort
+    -- | Boil Duration Wort
+    -- | Chill FinalTemperature Wort
+    -- | Concentrate ResultingVolume Wort
+    -- | Dilute ResultingVolume Wort deriving (Show)
 
-data Mash = AddWater Volume
-    | AddGrain Fermentable Weight Mash
-    | DoMash InitialTemperature FinalTemperature Duration Mash deriving (Show)
+-- data Mash = AddWater Volume
+    -- | AddGrain Fermentable Weight Mash
+    -- | DoMash InitialTemperature FinalTemperature Duration Mash deriving (Show)
 
-data Beer = Ferment Wort Temperature Duration deriving (Show)
+-- data Beer = Ferment Wort Temperature Duration deriving (Show)

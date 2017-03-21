@@ -4,6 +4,9 @@ import BeerXML
 
 main :: IO ()
 main = do
-    fileContents <- readFile "exampledata/hops.xml"
-    putStrLn ("hej " ++ show (getHops fileContents))
+    hopFileContents <- readFile "exampledata/hops.xml"
+    fermentableFileContents <- readFile "exampledata/grain.xml"
+    putStrLn ("hej " ++ show (getHops hopFileContents))
+    putStrLn ("hej " ++ show (getFermentables fermentableFileContents))
+    
 
