@@ -15,11 +15,6 @@ module Transformations
 import Ingredients
 import Utilities
 
-mkMash :: Volume -> Mash
-mkMash vol = AddWater vol
-
-addFermentable :: Fermentable -> Weight -> Mash -> Mash
-addFermentable ferm wt mash = AddGrain ferm wt mash
 
 doMash :: Mash -> InitialTemperature -> FinalTemperature -> Duration -> Mash
 doMash mash initialTemperature finalTemperature duration = DoMash initialTemperature finalTemperature duration mash

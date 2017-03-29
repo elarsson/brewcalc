@@ -21,7 +21,7 @@ data Fermentable = Fermentable
                 amount :: Weight,
                 yield :: Percentage,
                 color :: Double,
-                addAfterBoil :: Maybe Bool,
+                addAfterBoil :: Maybe CBool,
                 origin :: Maybe String,
                 supplier :: Maybe String,
                 notes :: Maybe String,
@@ -30,7 +30,7 @@ data Fermentable = Fermentable
                 diastaticPower :: Maybe Double,
                 protein :: Maybe Percentage,
                 maxInBatch :: Maybe Percentage,
-                recommendMash :: Maybe Bool,
+                recommendMash :: Maybe CBool,
                 ibuGalPerLb :: Maybe Double
             }
   deriving (Show, Eq)

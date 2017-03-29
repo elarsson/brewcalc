@@ -17,11 +17,13 @@ module Ingredients
 , InitialTemperature(..)
 , FinalTemperature(..)
 , Temperature(..)
+, CBool(..)
+, PPM(..)
 ) where
 import Text.Read
 
 -- Units
-newtype Volume = Milliliters Double
+newtype Volume = Milliliters Double deriving (Eq)
 instance Num Volume where
     (+) (Milliliters w1) (Milliliters w2) = Milliliters (w1 + w2)
     (*) (Milliliters w1) (Milliliters w2) = Milliliters (w1 * w2)
@@ -32,6 +34,10 @@ instance Num Volume where
     fromInteger i = Milliliters (fromInteger i)
 instance Show Volume where
     show (Milliliters a) = show a ++ "ml"
+instance Read Volume where
+    readsPrec _ xs = case readMaybe xs of
+                            Nothing -> []
+                            Just d -> return (Milliliters d, "")
 
 newtype Bitterness = IBU Double
 instance Num Bitterness where
@@ -83,8 +89,16 @@ instance Read Percentage where
                             Nothing -> []
                             Just d -> return (Percentage d, "")
 
+newtype PPM = PPM Double deriving (Eq)
+instance Show PPM where
+    show (PPM a) = show a ++ "ppm"
+instance Read PPM where
+    readsPrec _ xs = case readMaybe xs of
+                            Nothing -> []
+                            Just d -> return (PPM d, "")
+
 newtype Efficiency = Efficiency Percentage deriving (Show)
-newtype Temperature = Celsius Double deriving (Show)
+newtype Temperature = Celsius Double deriving (Show, Eq)
 newtype ABV = ABV Percentage
 
 --data HopAmount = HopAmount Hops Weight deriving (Show)
@@ -92,6 +106,11 @@ type ResultingVolume = Volume
 type InitialTemperature = Temperature
 type FinalTemperature = Temperature
 
+data CBool = True | False deriving (Show, Eq)
+instance Read CBool where
+    readsPrec _ "TRUE" = return (Ingredients.True, "")
+    readsPrec _ "FALSE" = return (Ingredients.False, "")
+    readsPrec _ _ = []
 
 --data Hops = Hops { hopName :: String, alphaContent :: Percentage } deriving Show
 

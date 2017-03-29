@@ -1,39 +1,95 @@
 module BeerXML(
 getHops,
-getFermentables
+getFermentables,
+getYeasts,
+getWaters,
+getWatersFromXml,
+getRecipes,
+getRecipesFromXml,
+getMashProfilesFromXml
 ) where 
 
 import Ingredients
 import IngredientsHops
 import IngredientsFermentable
+import IngredientsYeast
+import IngredientsMash
+import IngredientsWater
 import Text.XML.Light
 import Text.Read
 import Data.Maybe
 import Control.Monad
+import Data.List.NonEmpty
 
-getIngredient :: String -> String -> (Element -> Maybe a) -> String -> [a]
-getIngredient outerTag innerTag parseFn xml = 
-    case (parseXMLDoc xml) of
-        Nothing -> []
-        Just e -> 
+getMashProfile :: Element -> Maybe MashProfile
+getMashProfile profile =
+    Just (TestMashProfile "HEJ") -- TODO call read mash step function
+
+getRecipe :: Element -> Maybe Mash
+getRecipe recipe =
+    let
+        hops = getHops recipe
+        fermentables = getFermentables recipe
+        waters = nonEmpty $ getWaters recipe
+    in
+    case waters of
+        Nothing -> 
+            case nonEmpty [mkTestWater "HEJ"] of 
+                Nothing -> Nothing--Just (mkMash (nonEmpty [mkTestWater "HEJ"]))
+                Just d -> Just $ mkMash d
+        Just nl -> Just (mkMash nl)
+    -- do
+        -- waters <- nonEmpty $ getWaters recipe
+        -- return $ mkMash waters
+    
+    
+
+getIngredient :: String -> (Element -> Maybe a) -> Element -> [a]
+getIngredient innerTag parseFn e =
             let 
                 elements :: [Element]
-                elements = (findElements QName { qName = outerTag, qURI = Nothing, qPrefix = Nothing } e)
-
-                mgh mm = mapM parseFn (findChildren QName { qName = innerTag, qURI = Nothing, qPrefix = Nothing } mm)
+                elements = (findElements QName { qName = innerTag, qURI = Nothing, qPrefix = Nothing } e)
             in
-            concat $ concat $ sequence $ map mgh elements
+            case mapM parseFn elements of
+                Nothing -> []
+                Just l -> l
 
-getHops :: String -> [Hop]
-getHops = getIngredient "HOPS" "HOP" getHop
+getIngredients :: String -> String -> (Element -> Maybe a) -> Element -> [a]
+getIngredients outerTag innerTag parseFn e =
+            let elements = (findElements QName { qName = outerTag, qURI = Nothing, qPrefix = Nothing } e)
+            in concat $ sequence $ Prelude.map (getIngredient innerTag parseFn) elements
 
-getFermentables :: String -> [Fermentable]
-getFermentables = getIngredient "FERMENTABLES" "FERMENTABLE" getFermentable
+getIngredientsFromXml :: String -> String -> (Element -> Maybe a) -> String -> [a]
+getIngredientsFromXml outerTag innerTag parseFn xml =
+    case (parseXMLDoc xml) of
+        Nothing -> []
+        Just e -> getIngredients outerTag innerTag parseFn e
 
+getMashProfilesFromXml :: String -> [MashProfile]
+getMashProfilesFromXml = getIngredientsFromXml "MASHS" "MASH" getMashProfile
+
+getRecipesFromXml :: String -> [Mash]
+getRecipesFromXml = getIngredientsFromXml "RECIPES" "RECIPE" getRecipe
+
+getRecipes :: Element -> [Mash]
+getRecipes = getIngredients "RECIPES" "RECIPE" getRecipe
+
+getHops :: Element -> [Hop]
+getHops = getIngredients "HOPS" "HOP" getHop
+
+getWaters :: Element -> [Water]
+getWaters = getIngredients "WATERS" "WATER" getWater
+getWatersFromXml :: String -> [Water]
+getWatersFromXml = getIngredientsFromXml "WATERS" "WATER" getWater
+
+getFermentables :: Element -> [Fermentable]
+getFermentables = getIngredients "FERMENTABLES" "FERMENTABLE" getFermentable
+
+getYeasts :: Element -> [Yeast]
+getYeasts = getIngredients "YEASTS" "YEAST" getYeast
 
 getString :: Maybe Element -> Maybe String
 getString = liftM strContent
-
 
 getValue :: (Read a) => Maybe Element -> Maybe a
 getValue e = do
@@ -65,22 +121,22 @@ getHop e =
             return Hop 
                 {
                     IngredientsHops.name = name,
-                    alpha = alpha,
+                    IngredientsHops.alpha = alpha,
                     IngredientsHops.version = version,
                     IngredientsHops.amount = amount,
-                    use = use,
-                    time = time,
+                    IngredientsHops.use = use,
+                    IngredientsHops.time = time,
                     IngredientsHops.notes = notes,
-                    usedAsType = usedAsType,
-                    form = form,
-                    beta = beta,
-                    hSI = hSI,
+                    IngredientsHops.usedAsType = usedAsType,
+                    IngredientsHops.form = form,
+                    IngredientsHops.beta = beta,
+                    IngredientsHops.hSI = hSI,
                     IngredientsHops.origin = origin,
-                    substitutes = substitutes,
-                    humulene = humulene,
-                    caryophyllene = caryophyllene,
-                    cohumulone = cohumulone,
-                    myrcene = myrcene
+                    IngredientsHops.substitutes = substitutes,
+                    IngredientsHops.humulene = humulene,
+                    IngredientsHops.caryophyllene = caryophyllene,
+                    IngredientsHops.cohumulone = cohumulone,
+                    IngredientsHops.myrcene = myrcene
                 }
 
 
@@ -125,4 +181,69 @@ getFermentable e =
                     IngredientsFermentable.maxInBatch = maxInBatch,
                     IngredientsFermentable.recommendMash = recommendMash,
                     IngredientsFermentable.ibuGalPerLb = ibuGalPerLb
+                }
+
+
+    
+    
+    
+    
+getYeastAmount :: CBool -> Maybe Element -> Maybe YeastAmount
+getYeastAmount Ingredients.True me =
+        case (getValue me) of
+            Nothing -> Nothing
+            Just w -> return (YeastWeight w)
+getYeastAmount Ingredients.False me =
+        case (getValue me) of
+            Nothing -> Nothing
+            Just w -> return (YeastVolume w)
+
+
+getYeast :: Element -> Maybe Yeast
+getYeast e = 
+        do 
+            name <- getString $ findElement QName { qName = "NAME", qURI = Nothing, qPrefix = Nothing } e
+            version <- getValue $ findElement QName { qName = "VERSION", qURI = Nothing, qPrefix = Nothing } e
+            yeastType <- getValue $ findElement QName { qName = "TYPE", qURI = Nothing, qPrefix = Nothing } e
+            form <- getValue $ findElement QName { qName = "FORM", qURI = Nothing, qPrefix = Nothing } e
+            amountIsWeight <- getValue $ findElement QName { qName = "AMOUNT_IS_WEIGHT", qURI = Nothing, qPrefix = Nothing } e
+            amount <- getYeastAmount amountIsWeight $ findElement QName { qName = "AMOUNT", qURI = Nothing, qPrefix = Nothing } e
+            return Yeast
+                {
+                    IngredientsYeast.name = name,
+                    IngredientsYeast.version = version,
+                    IngredientsYeast.yeastType = yeastType,
+                    IngredientsYeast.amount = amount,
+                    IngredientsYeast.form = form
+                }
+
+getWater :: Element -> Maybe Water
+getWater e = 
+        let
+            notes = getString $ findElement QName { qName = "NOTES", qURI = Nothing, qPrefix = Nothing } e
+            pH = getValue $ findElement QName { qName = "PH", qURI = Nothing, qPrefix = Nothing } e
+        in
+        do 
+            name <- getString $ findElement QName { qName = "NAME", qURI = Nothing, qPrefix = Nothing } e
+            version <- getValue $ findElement QName { qName = "VERSION", qURI = Nothing, qPrefix = Nothing } e
+            amount <- getValue $ findElement QName { qName = "AMOUNT", qURI = Nothing, qPrefix = Nothing } e
+            calcium <- getValue $ findElement QName { qName = "CALCIUM", qURI = Nothing, qPrefix = Nothing } e
+            bicarbonate <- getValue $ findElement QName { qName = "BICARBONATE", qURI = Nothing, qPrefix = Nothing } e
+            sulfate <- getValue $ findElement QName { qName = "SULFATE", qURI = Nothing, qPrefix = Nothing } e
+            chloride <- getValue $ findElement QName { qName = "CHLORIDE", qURI = Nothing, qPrefix = Nothing } e
+            sodium <- getValue $ findElement QName { qName = "SODIUM", qURI = Nothing, qPrefix = Nothing } e
+            magnesium <- getValue $ findElement QName { qName = "MAGNESIUM", qURI = Nothing, qPrefix = Nothing } e
+            return Water 
+                {
+                    IngredientsWater.name = name,
+                    IngredientsWater.version = version,
+                    IngredientsWater.amount = amount,
+                    IngredientsWater.notes = notes,
+                    IngredientsWater.calcium = calcium,
+                    IngredientsWater.bicarbonate = bicarbonate,
+                    IngredientsWater.sulfate = sulfate,
+                    IngredientsWater.chloride = chloride,
+                    IngredientsWater.sodium = sodium,
+                    IngredientsWater.magnesium = magnesium,
+                    IngredientsWater.pH = pH
                 }

@@ -1,4 +1,6 @@
 module IngredientsYeast (
+Yeast(..),
+YeastAmount(..)
 )
 where
 import Ingredients
@@ -6,7 +8,7 @@ import Ingredients
 
 data YeastType = Ale | Lager | Wheat | Wine | Champagne deriving (Show, Eq, Read)
 data YeastForm = Liquid | Dry | Slant | Culture deriving (Show, Eq, Read)
-data YeastAmount = YeastWeight Weight | YeastVolume Volume (Show, Eq)
+data YeastAmount = YeastWeight Weight | YeastVolume Volume deriving (Show, Eq)
 
 data Yeast = Yeast
             {
@@ -15,18 +17,5 @@ data Yeast = Yeast
                 yeastType :: YeastType,
                 form :: YeastForm,
                 amount :: YeastAmount
-                -- yield :: Percentage,
-                -- color :: Double,
-                -- addAfterBoil :: Maybe Bool,
-                -- origin :: Maybe String,
-                -- supplier :: Maybe String,
-                -- notes :: Maybe String,
-                -- coarseFineDiff :: Maybe Percentage,
-                -- moisture :: Maybe Percentage,
-                -- diastaticPower :: Maybe Double,
-                -- protein :: Maybe Percentage,
-                -- maxInBatch :: Maybe Percentage,
-                -- recommendMash :: Maybe Bool,
-                -- ibuGalPerLb :: Maybe Double
             }
   deriving (Show, Eq)
