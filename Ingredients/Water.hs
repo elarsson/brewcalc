@@ -1,9 +1,9 @@
-module IngredientsWater (
+module Ingredients.Water (
 Water(..),
 mkTestWater
 )
 where
-import Ingredients
+import Ingredients.Common
 mkTestWater :: String -> Water
 mkTestWater name = Water {
                     name = name,

@@ -1,4 +1,4 @@
-import BeerXML
+import BeerXML.Parser
 
 
 

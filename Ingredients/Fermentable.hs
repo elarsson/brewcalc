@@ -1,7 +1,7 @@
-module IngredientsFermentable(
+module Ingredients.Fermentable(
 Fermentable(..)
 ) where
-import Ingredients
+import Ingredients.Common
 
 -- Components
 data FermentableType = Grain | Sugar | Extract | DryExtract | Adjunct deriving (Show, Eq)

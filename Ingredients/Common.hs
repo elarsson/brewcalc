@@ -1,4 +1,4 @@
-module Ingredients
+module Ingredients.Common
 ( Weight(..)
 , Density(..)
 , Volume(..)
@@ -20,7 +20,7 @@ module Ingredients
 , CBool(..)
 , PPM(..)
 ) where
-import Text.Read
+
 
 -- Units
 newtype Volume = Milliliters Double deriving (Eq)
@@ -34,10 +34,6 @@ instance Num Volume where
     fromInteger i = Milliliters (fromInteger i)
 instance Show Volume where
     show (Milliliters a) = show a ++ "ml"
-instance Read Volume where
-    readsPrec _ xs = case readMaybe xs of
-                            Nothing -> []
-                            Just d -> return (Milliliters d, "")
 
 newtype Bitterness = IBU Double
 instance Num Bitterness where
@@ -58,10 +54,6 @@ instance Num Duration where
     abs (Minutes w) = Minutes (abs w)
     signum (Minutes w) = Minutes (signum w)
     fromInteger i = Minutes (fromInteger i)
-instance Read Duration where
-    readsPrec _ xs = case readMaybe xs of
-                            Nothing -> []
-                            Just d -> return (Minutes d, "")
 
 newtype Density = Density Double deriving (Show)
 instance Num Density where
@@ -76,33 +68,17 @@ instance Num Density where
 newtype Weight = Kilograms Double deriving (Eq)
 instance Show Weight where
     show (Kilograms a) = show a ++ "kg"
-instance Read Weight where
-    readsPrec _ xs = case readMaybe xs of
-                            Nothing -> []
-                            Just d -> return (Kilograms d, "")
 
 newtype Percentage = Percentage Double deriving (Eq)
 instance Show Percentage where
     show (Percentage a) = show a ++ "%"
-instance Read Percentage where
-    readsPrec _ xs = case readMaybe xs of
-                            Nothing -> []
-                            Just d -> return (Percentage d, "")
 
 newtype PPM = PPM Double deriving (Eq)
 instance Show PPM where
     show (PPM a) = show a ++ "ppm"
-instance Read PPM where
-    readsPrec _ xs = case readMaybe xs of
-                            Nothing -> []
-                            Just d -> return (PPM d, "")
 
 newtype Efficiency = Efficiency Percentage deriving (Show)
 newtype Temperature = Celsius Double deriving (Show, Eq)
-instance Read Temperature where
-    readsPrec _ xs = case readMaybe xs of
-                            Nothing -> []
-                            Just d -> return (Celsius d, "")
 newtype ABV = ABV Percentage
 
 --data HopAmount = HopAmount Hops Weight deriving (Show)
@@ -111,10 +87,6 @@ type InitialTemperature = Temperature
 type FinalTemperature = Temperature
 
 data CBool = True | False deriving (Show, Eq)
-instance Read CBool where
-    readsPrec _ "TRUE" = return (Ingredients.True, "")
-    readsPrec _ "FALSE" = return (Ingredients.False, "")
-    readsPrec _ _ = []
 
 --data Hops = Hops { hopName :: String, alphaContent :: Percentage } deriving Show
 

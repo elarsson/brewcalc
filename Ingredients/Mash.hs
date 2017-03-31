@@ -1,4 +1,4 @@
-module IngredientsMash
+module Ingredients.Mash
 (
   Mash(..)
 , mkMash
@@ -8,9 +8,9 @@ module IngredientsMash
 , MashStepType(..)
 )
 where
-import Ingredients
-import IngredientsFermentable
-import IngredientsWater
+import Ingredients.Common
+import Ingredients.Fermentable
+import Ingredients.Water
 import Data.List.NonEmpty
 
 data Mash = AddWater (NonEmpty Water)

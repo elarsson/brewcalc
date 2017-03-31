@@ -1,9 +1,9 @@
-module IngredientsYeast (
+module Ingredients.Yeast (
 Yeast(..),
 YeastAmount(..)
 )
 where
-import Ingredients
+import Ingredients.Common
 
 
 data YeastType = Ale | Lager | Wheat | Wine | Champagne deriving (Show, Eq, Read)

@@ -1,7 +1,7 @@
-module IngredientsHops(
+module Ingredients.Hop (
 Hop(..)
 ) where 
-import Ingredients
+import Ingredients.Common
 
 data Use = UseBoil | DryHop | Mash | FirstWort | Aroma deriving (Show, Eq)
 instance Read Use where
