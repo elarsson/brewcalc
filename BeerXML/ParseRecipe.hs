@@ -7,6 +7,7 @@ import Text.XML.Light
 import Data.List.NonEmpty
 import Ingredients.Common
 import Ingredients.Mash
+import Ingredients.Hop
 import Ingredients.Water
 import Ingredients.Fermentable
 import BeerXML.Common
@@ -15,22 +16,32 @@ import BeerXML.ParseWater
 import BeerXML.ParseYeast
 import BeerXML.ParseFermentable
 
-getRecipes :: Element -> [[Mash]]
+getRecipes :: Element -> [[Recipe]]
 getRecipes = getIngredients "RECIPES" "RECIPE" getRecipe
 
-getRecipe :: Element -> Maybe Mash
+data Recipe = Recipe {
+        hops :: NonEmpty Hop,
+        fermentables :: NonEmpty Fermentable,
+        waters :: [Water],
+        mashProfile :: MashProfile
+    }
+
+getRecipe :: Element -> Maybe Recipe
 getRecipe recipe =
     let
-        hops = getHops recipe
+        hopsM = concat $ getHops recipe
         fermentables = concat $ getFermentables recipe
-        waters = nonEmpty $ concat $ getWaters recipe
+        waters = concat $ getWaters recipe -- Optional record
+        mashProfile = listToMaybe (getMashProfiles recipe) -- Only use the first one
     in
-    case waters of
-        Nothing -> 
-            case nonEmpty [mkTestWater "HEJ"] of 
-                Nothing -> Nothing--Just (mkMash (nonEmpty [mkTestWater "HEJ"]))
-                Just d -> Just $ mkMash d
-        Just nl -> Just (mkMash nl)
-    -- do
-        -- waters <- nonEmpty $ getWaters recipe
-        -- return $ mkMash waters
+    do
+        mashProfile <- listToMaybe $ getMashProfiles recipe
+        nefermentables <- nonEmpty fermentables
+        nehops <- nonEmpty hops
+        return Recipe
+            {
+                mashProfile = mashProfile,
+                waters = waters,
+                hops = nehops,
+                fermentables = nefermentables
+            }
