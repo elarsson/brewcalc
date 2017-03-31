@@ -5,6 +5,7 @@ module IngredientsMash
 , addFermentable
 , MashStep(..)
 , MashProfile(..)
+, MashStepType(..)
 )
 where
 import Ingredients
@@ -23,7 +24,7 @@ mkMash vol = AddWater vol
 addFermentable :: Fermentable -> Mash -> Mash
 addFermentable ferm mash = AddFermentable ferm mash
 
-data MashStepType = Infusion Volume | Temperature | Decoction deriving (Eq, Show, Read)
+data MashStepType = Infusion Volume | Temperature | Decoction deriving (Eq, Show)
 
 data MashStep = MashStep
             {

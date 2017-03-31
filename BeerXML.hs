@@ -20,10 +20,8 @@ import Text.Read
 import Data.Maybe
 import Control.Monad
 import Data.List.NonEmpty
+import Debug.Trace
 
-getMashProfile :: Element -> Maybe MashProfile
-getMashProfile profile =
-    Just (TestMashProfile "HEJ") -- TODO call read mash step function
 
 getRecipe :: Element -> Maybe Mash
 getRecipe recipe =
@@ -68,11 +66,19 @@ getIngredientsFromXml outerTag innerTag parseFn xml =
 getMashProfilesFromXml :: String -> [MashProfile]
 getMashProfilesFromXml = getIngredientsFromXml "MASHS" "MASH" getMashProfile
 
+--getElementFromXml :: String -> Maybe Element
+
 getRecipesFromXml :: String -> [Mash]
 getRecipesFromXml = getIngredientsFromXml "RECIPES" "RECIPE" getRecipe
 
 getRecipes :: Element -> [Mash]
 getRecipes = getIngredients "RECIPES" "RECIPE" getRecipe
+
+getMashSteps :: Element -> [MashStep]
+getMashSteps = getIngredients "MASH_STEPS" "MASH_STEP" getMashStep
+
+getMashProfiles :: Element -> [MashProfile]
+getMashProfiles = getIngredients "MASHS" "MASH" getMashProfile
 
 getHops :: Element -> [Hop]
 getHops = getIngredients "HOPS" "HOP" getHop
@@ -246,4 +252,54 @@ getWater e =
                     IngredientsWater.sodium = sodium,
                     IngredientsWater.magnesium = magnesium,
                     IngredientsWater.pH = pH
+                }
+
+getMashProfile :: Element -> Maybe MashProfile
+getMashProfile e =
+        let
+            notes = getString $ findElement QName { qName = "NOTES", qURI = Nothing, qPrefix = Nothing } e
+        in
+        do
+            name <- getString $ findElement QName { qName = "NAME", qURI = Nothing, qPrefix = Nothing } e
+            version <- getValue $ findElement QName { qName = "VERSION", qURI = Nothing, qPrefix = Nothing } e
+            grainTemp <- getValue $ findElement QName { qName = "GRAIN_TEMP", qURI = Nothing, qPrefix = Nothing } e
+            mashSteps <- nonEmpty $ getMashSteps e
+            return MashProfile
+                {
+                    IngredientsMash.profileName = name,
+                    IngredientsMash.profileVersion = version,
+                    IngredientsMash.grainTemp = grainTemp,
+                    IngredientsMash.mashSteps = mashSteps,
+                    IngredientsMash.notes = notes
+                }
+
+getMashStepType :: Maybe String -> Maybe Volume -> Maybe MashStepType
+getMashStepType (Just "INFUSION") (Just vol) = return (Infusion vol)
+getMashStepType (Just "DECOCTION") Nothing = return Decoction
+getMashStepType (Just "TEMPERATURE") Nothing = return Temperature
+getMashStepType _ _ = Nothing
+
+getMashStep :: Element -> Maybe MashStep
+getMashStep e =
+        let
+            typeName = getString $ findElement QName { qName = "TYPE", qURI = Nothing, qPrefix = Nothing } e
+            infuseAmount = getValue $ findElement QName { qName = "INFUSE_AMOUNT", qURI = Nothing, qPrefix = Nothing } e
+            rampTime = getValue $ findElement QName { qName = "RAMP_TIME", qURI = Nothing, qPrefix = Nothing } e
+            endTemp = getValue $ findElement QName { qName = "END_TEMP", qURI = Nothing, qPrefix = Nothing } e
+        in
+        do
+            name <- getString $ findElement QName { qName = "NAME", qURI = Nothing, qPrefix = Nothing } e
+            version <- getValue $ findElement QName { qName = "VERSION", qURI = Nothing, qPrefix = Nothing } e
+            stepType <- getMashStepType typeName infuseAmount
+            stepTemp <- getValue $ findElement QName { qName = "STEP_TEMP", qURI = Nothing, qPrefix = Nothing } e
+            stepTime <- getValue $ findElement QName { qName = "STEP_TIME", qURI = Nothing, qPrefix = Nothing } e
+            return MashStep
+                {
+                    IngredientsMash.stepName = name,
+                    IngredientsMash.stepVersion = version,
+                    IngredientsMash.stepType = stepType,
+                    IngredientsMash.stepTemp = stepTemp,
+                    IngredientsMash.stepTime = stepTime,
+                    IngredientsMash.rampTime = rampTime,
+                    IngredientsMash.endTemp = endTemp
                 }

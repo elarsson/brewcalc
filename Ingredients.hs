@@ -99,6 +99,10 @@ instance Read PPM where
 
 newtype Efficiency = Efficiency Percentage deriving (Show)
 newtype Temperature = Celsius Double deriving (Show, Eq)
+instance Read Temperature where
+    readsPrec _ xs = case readMaybe xs of
+                            Nothing -> []
+                            Just d -> return (Celsius d, "")
 newtype ABV = ABV Percentage
 
 --data HopAmount = HopAmount Hops Weight deriving (Show)
