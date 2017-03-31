@@ -15,6 +15,6 @@ main = do
     -- putStrLn ("hej " ++ show (getYeasts yeastFileContents))
     -- putStrLn ("hej " ++ show (getWatersFromXml waterFileContents))
     putStrLn ("hej " ++ show (getMashProfilesFromXml mashFileContents))
-    putStrLn ("hej " ++ show (getRecipesFromXml recipeFileContents))
+--    putStrLn ("hej " ++ show (getRecipesFromXml recipeFileContents))
     
 

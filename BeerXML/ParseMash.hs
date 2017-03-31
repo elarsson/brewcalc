@@ -8,12 +8,13 @@ import Data.List.NonEmpty
 import Ingredients.Common
 import Ingredients.Mash
 import BeerXML.Common
+import Debug.Trace
 
 getMashSteps :: Element -> [[MashStep]]
 getMashSteps = getIngredients "MASH_STEPS" "MASH_STEP" getMashStep
 
 getMashProfiles :: Element -> [[MashProfile]]
-getMashProfiles = getIngredients "MASHS" "MASH" getMashProfile
+getMashProfiles e = getIngredients "MASHS" "MASH" getMashProfile e
 
 getMashProfile :: Element -> Maybe MashProfile
 getMashProfile e =
@@ -35,9 +36,9 @@ getMashProfile e =
                 }
 
 getMashStepType :: Maybe String -> Maybe Volume -> Maybe MashStepType
-getMashStepType (Just "INFUSION") (Just vol) = return (Infusion vol)
-getMashStepType (Just "DECOCTION") Nothing = return Decoction
-getMashStepType (Just "TEMPERATURE") Nothing = return Temperature
+getMashStepType (Just "Infusion") (Just vol) = return (Infusion vol)
+getMashStepType (Just "Decoction") _ = return Decoction
+getMashStepType (Just "Temperature") _ = return Temperature
 getMashStepType _ _ = Nothing
 
 getMashStep :: Element -> Maybe MashStep
