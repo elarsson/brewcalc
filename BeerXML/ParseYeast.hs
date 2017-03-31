@@ -9,7 +9,7 @@ import Ingredients.Yeast
 import BeerXML.Common
 
 
-getYeasts :: Element -> [Yeast]
+getYeasts :: Element -> [[Yeast]]
 getYeasts = getIngredients "YEASTS" "YEAST" getYeast
 
 getYeastAmount :: CBool -> Maybe Element -> Maybe YeastAmount

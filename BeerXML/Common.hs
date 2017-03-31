@@ -27,10 +27,10 @@ getIngredient innerTag parseFn e =
                 Nothing -> []
                 Just l -> l
 
-getIngredients :: String -> String -> (Element -> Maybe a) -> Element -> [a]
+getIngredients :: String -> String -> (Element -> Maybe a) -> Element -> [[a]]
 getIngredients outerTag innerTag parseFn e =
             let elements = (findElements QName { qName = outerTag, qURI = Nothing, qPrefix = Nothing } e)
-            in concat $ sequence $ Prelude.map (getIngredient innerTag parseFn) elements
+            in sequence $ Prelude.map (getIngredient innerTag parseFn) elements
 
 getIngredientsFromXml :: (Element -> [a]) -> String -> [a]
 getIngredientsFromXml parseFn xml =

@@ -8,7 +8,7 @@ import Ingredients.Common
 import Ingredients.Water
 import BeerXML.Common
 
-getWaters :: Element -> [Water]
+getWaters :: Element -> [[Water]]
 getWaters = getIngredients "WATERS" "WATER" getWater
 
 

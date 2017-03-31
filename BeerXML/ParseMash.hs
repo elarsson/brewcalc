@@ -9,10 +9,10 @@ import Ingredients.Common
 import Ingredients.Mash
 import BeerXML.Common
 
-getMashSteps :: Element -> [MashStep]
+getMashSteps :: Element -> [[MashStep]]
 getMashSteps = getIngredients "MASH_STEPS" "MASH_STEP" getMashStep
 
-getMashProfiles :: Element -> [MashProfile]
+getMashProfiles :: Element -> [[MashProfile]]
 getMashProfiles = getIngredients "MASHS" "MASH" getMashProfile
 
 getMashProfile :: Element -> Maybe MashProfile
@@ -24,7 +24,7 @@ getMashProfile e =
             name <- getString $ findElement QName { qName = "NAME", qURI = Nothing, qPrefix = Nothing } e
             version <- getValue $ findElement QName { qName = "VERSION", qURI = Nothing, qPrefix = Nothing } e
             grainTemp <- getValue $ findElement QName { qName = "GRAIN_TEMP", qURI = Nothing, qPrefix = Nothing } e
-            mashSteps <- nonEmpty $ getMashSteps e
+            mashSteps <- nonEmpty $ concat $ getMashSteps e
             return MashProfile
                 {
                     Ingredients.Mash.profileName = name,

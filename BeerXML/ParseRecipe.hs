@@ -15,15 +15,15 @@ import BeerXML.ParseWater
 import BeerXML.ParseYeast
 import BeerXML.ParseFermentable
 
-getRecipes :: Element -> [Mash]
+getRecipes :: Element -> [[Mash]]
 getRecipes = getIngredients "RECIPES" "RECIPE" getRecipe
 
 getRecipe :: Element -> Maybe Mash
 getRecipe recipe =
     let
         hops = getHops recipe
-        fermentables = getFermentables recipe
-        waters = nonEmpty $ getWaters recipe
+        fermentables = concat $ getFermentables recipe
+        waters = nonEmpty $ concat $ getWaters recipe
     in
     case waters of
         Nothing -> 

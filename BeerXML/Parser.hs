@@ -16,15 +16,15 @@ import Ingredients.Water
 import Ingredients.Hop
 
 
-getMashProfilesFromXml :: String -> [MashProfile]
+getMashProfilesFromXml :: String -> [[MashProfile]]
 getMashProfilesFromXml = getIngredientsFromXml getMashProfiles
 
-getRecipesFromXml :: String -> [Mash]
+getRecipesFromXml :: String -> [[Mash]]
 getRecipesFromXml = getIngredientsFromXml getRecipes
 
-getWatersFromXml :: String -> [Water]
+getWatersFromXml :: String -> [[Water]]
 getWatersFromXml = getIngredientsFromXml getWaters
 
-getHopsFromXml :: String -> [Hop]
+getHopsFromXml :: String -> [[Hop]]
 getHopsFromXml = getIngredientsFromXml getHops
 

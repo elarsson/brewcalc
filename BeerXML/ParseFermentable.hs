@@ -8,7 +8,7 @@ import Ingredients.Common
 import Ingredients.Fermentable
 import BeerXML.Common
 
-getFermentables :: Element -> [Fermentable]
+getFermentables :: Element -> [[Fermentable]]
 getFermentables = getIngredients "FERMENTABLES" "FERMENTABLE" getFermentable
 
 

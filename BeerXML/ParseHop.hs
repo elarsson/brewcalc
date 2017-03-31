@@ -8,7 +8,7 @@ import Ingredients.Common
 import Ingredients.Hop
 import BeerXML.Common
 
-getHops :: Element -> [Hop]
+getHops :: Element -> [[Hop]]
 getHops = getIngredients "HOPS" "HOP" getHop
 
 getHop :: Element -> Maybe Hop
