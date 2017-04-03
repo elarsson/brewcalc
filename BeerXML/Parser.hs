@@ -19,7 +19,7 @@ import Ingredients.Hop
 getMashProfilesFromXml :: String -> [[MashProfile]]
 getMashProfilesFromXml = getIngredientsFromXml getMashProfiles
 
-getRecipesFromXml :: String -> [[Mash]]
+getRecipesFromXml :: String -> [[Recipe]]
 getRecipesFromXml = getIngredientsFromXml getRecipes
 
 getWatersFromXml :: String -> [[Water]]
