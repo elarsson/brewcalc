@@ -7,6 +7,7 @@ import Text.XML.Light
 import Ingredients.Common
 import Ingredients.Hop
 import BeerXML.Common
+import Debug.Trace
 
 getHops :: Element -> [[Hop]]
 getHops = getIngredients "HOPS" "HOP" getHop

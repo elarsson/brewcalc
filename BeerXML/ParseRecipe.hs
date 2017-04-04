@@ -23,29 +23,27 @@ getRecipes :: Element -> [[Recipe]]
 getRecipes = getIngredients "RECIPES" "RECIPE" getRecipe
 
 data Recipe = Recipe {
-        -- hops :: NonEmpty Hop--,
-        -- fermentables :: NonEmpty Fermentable,
-        -- waters :: [Water],
+        hops :: NonEmpty Hop,
+        fermentables :: NonEmpty Fermentable,
+        waters :: [Water],
         mashProfile :: MashProfile
     } deriving (Show,Eq)
 
 getRecipe :: Element -> Maybe Recipe
 getRecipe recipe =
     let
-        -- hopsM = concat $ getHops recipe
-        -- fermentables = concat $ getFermentables recipe
-        -- waters = concat $ getWaters recipe -- Optional record
-        mashProfiles = listToMaybe (getMashProfiles recipe) -- Only use the first one
+        hopsM = concat $ getHops recipe
+        fermentables = concat $ getFermentables recipe
+        waters = concat $ getWaters recipe -- Optional record
     in
     do
-        allMashProfiles <- (trace $ show (getMashProfiles recipe)) mashProfiles
-        mashProfile <- listToMaybe allMashProfiles
-        -- nefermentables <- nonEmpty fermentables
-        -- nehops <- nonEmpty hopsM
+        mashProfile <- getMashProfile recipe
+        nefermentables <- nonEmpty fermentables
+        nehops <- nonEmpty hopsM
         return Recipe
             {
-                mashProfile = mashProfile
-                -- waters = waters,
-                -- hops = nehops
-                -- fermentables = nefermentables
+                mashProfile = mashProfile,
+                waters = waters,
+                hops = nehops,
+                fermentables = nefermentables
             }

@@ -6,9 +6,9 @@ import Ingredients.Common
 data Use = UseBoil | DryHop | Mash | FirstWort | Aroma deriving (Show, Eq)
 instance Read Use where
     readsPrec _ "Boil" = return (UseBoil, "")
-    readsPrec _ "DryHop" = return (DryHop, "")
+    readsPrec _ "Dry Hop" = return (DryHop, "")
     readsPrec _ "Mash" = return (Mash, "")
-    readsPrec _ "FirstWort" = return (FirstWort, "")
+    readsPrec _ "First Wort" = return (FirstWort, "")
     readsPrec _ "Aroma" = return (Aroma, "")
     readsPrec _ _ = []
 

@@ -24,8 +24,8 @@ getIngredient innerTag parseFn e =
                 elements = (findElements QName { qName = innerTag, qURI = Nothing, qPrefix = Nothing } e)
             in
             case mapM parseFn elements of
-                Nothing -> (trace $ "tomlista" ++ innerTag)[]
-                Just l -> (trace "hello") l
+                Nothing -> []
+                Just l -> l
 
 getIngredients :: String -> String -> (Element -> Maybe a) -> Element -> [[a]]
 getIngredients outerTag innerTag parseFn e =

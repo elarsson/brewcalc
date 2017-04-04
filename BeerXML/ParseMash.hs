@@ -1,5 +1,6 @@
 module BeerXML.ParseMash (
 getMashProfiles
+,getMashProfile
 )
 where
 import Data.Maybe
@@ -11,10 +12,10 @@ import BeerXML.Common
 import Debug.Trace
 
 getMashSteps :: Element -> [[MashStep]]
-getMashSteps = (trace "hej")getIngredients "MASH_STEPS" "MASH_STEP" getMashStep
+getMashSteps = getIngredients "MASH_STEPS" "MASH_STEP" getMashStep
 
 getMashProfiles :: Element -> [[MashProfile]]
-getMashProfiles e = (trace "huu")getIngredients "MASHS" "MASH" getMashProfile e
+getMashProfiles e = getIngredients "MASHS" "MASH" getMashProfile e
 
 getMashProfile :: Element -> Maybe MashProfile
 getMashProfile e =
@@ -22,8 +23,8 @@ getMashProfile e =
             notes = getString $ findElement QName { qName = "NOTES", qURI = Nothing, qPrefix = Nothing } e
         in
         do
-            name <- (trace "hepp")getString $ findElement QName { qName = "NAME", qURI = Nothing, qPrefix = Nothing } e
-            version <- (trace name)getValue $ findElement QName { qName = "VERSION", qURI = Nothing, qPrefix = Nothing } e
+            name <- getString $ findElement QName { qName = "NAME", qURI = Nothing, qPrefix = Nothing } e
+            version <- getValue $ findElement QName { qName = "VERSION", qURI = Nothing, qPrefix = Nothing } e
             grainTemp <- getValue $ findElement QName { qName = "GRAIN_TEMP", qURI = Nothing, qPrefix = Nothing } e
             mashSteps <- nonEmpty $ concat $ getMashSteps e
             return MashProfile
